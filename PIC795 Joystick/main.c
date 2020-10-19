@@ -9,6 +9,7 @@
  * 10-17-20: Got CRC working.
  * 10-18-20: Got forward/backward/right/left working with one joystick for PIC795 MD13S CONTROLLER.
  *           Ready for first GitHub save.
+ * 10-19-20: Transmitting two joysticks with four integers total.
  ***********************************************************************************/
 #define	STX '>'
 #define	DLE '/'
@@ -156,14 +157,13 @@ int main(void)
             AD1CON1bits.ASAM = 1;        // Restart sampling.       
             outData[0] = ADresult[2]-512;
             outData[1] = 512-ADresult[3];
+            outData[2] = ADresult[0]-512;
+            outData[3] = 512-ADresult[1];
             // printf(">%ld RL: %d, FR: %d\r", loopCounter++, outData[0], outData[1]);
             command = 0x56;
             subcommand = 0x78;
-            numData = 2;    
-            loopCounter++;
-            if (loopCounter == STX || loopCounter == ETX || loopCounter == DLE) loopCounter++;
-                    
-            if (BuildPacket(loopCounter, subcommand, numData, outData, outPacket, &packetLength))
+            numData = 4;                        
+            if (BuildPacket(command, subcommand, numData, outData, outPacket, &packetLength))
             {
                 for(i = 0; i < packetLength; i++)
                 {
